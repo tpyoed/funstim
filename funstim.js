@@ -56,17 +56,7 @@ onmessage = e => {
         actionIndex++;
         a1 = actions[actionIndex];
       }
-      
-      let dist = a1.at - a0.at;
-      let dpos = a1.pos - a0.pos;
-      
-      let alpha = Math.max(0, Math.min(1, (sample - a0.at) / dist)) || 0;
-      let pos = Math.max(0, Math.min(1, a0.pos + dpos * alpha));
-      
-      if(e.doubletime) {
-        pos = Math.abs((alpha * 2) - 1);
-      }
-      
+            
       let amp = 0;
       
       if(e.fadeonpause && fadeSamples) {
@@ -88,7 +78,7 @@ onmessage = e => {
           amp = (fadeSamples - dmin) / fadeSamples;
         }
       } else {
-        amp = 1;
+        amp = a1.pos / 100.0;
       }
       
       if(sample < fadeSamples) {
@@ -106,10 +96,9 @@ onmessage = e => {
       ampFilter = amp;
       
       let inphase = radsPerSample.reduce((a, c) => a + Math.sin(sample * c), 0) / radsPerSample.length;
-      let outphase = radsPerSample.reduce((a, c) => a + e.polarity * Math.sin(sample * c + pos * Math.PI), 0) / radsPerSample.length;
       
       left[i] = inphase * 32767 * amp * e.amplitude;
-      right[i] = outphase * 32767 * amp * e.amplitude;
+      right[i] = left[i];
       
       if(e.debug) {
         left[i] = ((amp * 2) - 1) * 32767;
@@ -147,3 +136,4 @@ onmessage = e => {
   
   close();
 }
+
